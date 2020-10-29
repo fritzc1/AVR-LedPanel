@@ -39,18 +39,21 @@
         // 20 ?
 #define CMD_UART_GLOBAL_CMD_ADDR		0x00
 
-void initCommandProtocolAddr(void);
-u08 setCommandProtocolAddr(u08 newAddr);
+// the location in EEPROM from which to load/store address byte
+#define CMD_EEPROM_ADDR_THIS_DEVICE_ADDR		0x00
+
+void initCommandProtocolAddr(u08);
+u08 setCommandProtocolAddr(u08);
 u08 getCommandProtocolAddr(void);
 void initCmdHandler(void);
-void myUartRx(unsigned char c);
-u08 isMyAddress(u08 inAddr);
-u08 isGlobalAddress(u08 inAddr);
+void myUartRx(unsigned char);
+u08 isMyAddress(u08);
+u08 isGlobalAddress(u08);
 void sendMsg(void);
 void beginCmdProcessing(void);
 void endCmdProcessing(void);
 // used by command processors, advances the pointer over ASCII numbers. pass the address of your char *
-void getNextNonNumericChar(char **ppRxDataStr);
+void pointToNextNonNumericChar(unsigned char **);
 
 /*********************************************************************
  * Use these flags to control your application's behavior. They will tell
@@ -70,7 +73,7 @@ extern u08 customResponse; // if this is set, then don't send generic "ok" respo
 // the following vars are used to interact with uart receive ISR
 extern cBuffer uartRxBuffer;	// defined in uartchris.c
 extern unsigned short uartRxOverflow; // defined in uartchris.c
-extern char sprintbuf[80]; // output message buffer
+extern unsigned char sprintbuf[80]; // output message buffer
 
 #endif
 

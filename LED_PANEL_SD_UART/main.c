@@ -5,24 +5,33 @@
  * 
  ************************************************************************/
 
-#include "global.h" // F_CPU may be req'd by other imports
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h> // atoi
+
 #include <avr/io.h>
 #include <avr/interrupt.h>
-#include <util/delay.h>
-#include <stdint.h>
-#include <string.h> // memset()
 #include <avr/pgmspace.h>
+
+#include "global.h" // F_CPU may be req'd by other imports
+#include "rprintf.h"
 #include "WS2812.h"
 #include "bufferchris.h"
 #include "uartchris.h"
 #include "commandprotocol.h"
 
+#include <util/delay.h> // depends on FCPU in global.h
+
 // define global variables
 u08 buf[NUM_LEDS]; // half display
 u16 bufindex;
+char myVolatileStr[40];
 
 // function prototypes
 void processCmd(void);
+void setVolatileString(unsigned char *);
+unsigned char * getVolatileString(void);
 void loopRefreshingDisplay(void);
 
 /*************************************************/
@@ -734,11 +743,9 @@ int main(void) {
   uartInit();
   uartSetBaudRate(9600);
   
-  // get a pointer to the data portion of RX buffer
-  cBuffer* myRxBufferPtr;
-  u08 myRxBufferDataPtr;
-  myRxBufferPtr = uartGetRxBuffer();
-  myRxBufferDataPtr = myRxBufferPtr->dataptr;
+  // set address, if not already in eeprom
+  initCommandProtocolAddr(CMD_UART_THIS_DEVICE_ADDRESS);
+
   
   /* Loop forever, handle uart messages if we get any */
   while (1) {
@@ -749,6 +756,7 @@ int main(void) {
       processCmd(); // interpret the current waiting command
       endCmdProcessing(); // follow command protocol
     }
+    
   }
   loopRefreshingDisplay(); // put the old loop in a subroutine
 
@@ -770,10 +778,80 @@ int main(void) {
  *********************************************************************/
 void processCmd() {
   u08 rc; // return code from handler funcs
+  // get a pointer to the data portion of RX buffer
+  cBuffer* myRxBufferPtr;
+  unsigned char * myRxBufferDataPtr;
+  myRxBufferPtr = uartGetRxBuffer();
+  myRxBufferDataPtr = myRxBufferPtr->dataptr;
+  
+  while (*myRxBufferDataPtr) { // do until we are at the null term (end of cmd)
+    switch(*myRxBufferDataPtr++) { // get a char and then increment ptr
+      // SET Address
+      case 'a':
+        rc = setCommandProtocolAddr(atoi((char *)myRxBufferDataPtr));
+        if (rc) {
+          customResponse = TRUE;
+          sprintf_P(sprintbuf,PSTR("err-badaddr$"));
+          sendMsg();
+        }
+        // use EEPROM to store address between powerups. Only reprogram on non-global addr.
+        pointToNextNonNumericChar(&myRxBufferDataPtr);
+        break; // End 'a' command
+       
+      // Input Data String into a volatile variable on the arduino
+      case 'b': case 'B':
+        //; // "a label can only be a part of a statement" <= the following line declares a variable first
+        CRITICAL_SECTION_START;
+        setVolatileString(myRxBufferDataPtr);
+        CRITICAL_SECTION_END;
+        break; // End 'b' command
+       
+      // Get info
+      case 'g': case 'G':
+        // Indicate to cmd protocol that we are sending a custom ack
+        customResponse = TRUE;
+        // select sub-command
+        switch(*myRxBufferDataPtr++) {
+          case 'a': case 'A':
+            sprintf_P(sprintbuf, PSTR("g%d$"), getCommandProtocolAddr());
+            // SPECIAL CASE!! we WANT to get the address back on a global command!
+            // You can only have ONE device on the net for this to work. Otherwise, user beware!
+            rxAddrGlobal = FALSE;
+            sendMsg();
+            break;
+          
+          case 'b': case 'B':
+            sprintf_P(sprintbuf, PSTR("g%s$"), getVolatileString());
+            sendMsg();
+            break;
+            
+          default:
+            sprintf_P(sprintbuf,PSTR("err-getnoprop$"));
+            sendMsg();
+        }
+        break; // end 'g' command
+        
+      default:
+        customResponse = TRUE;
+        sprintf_P(sprintbuf, PSTR("err-cmd$"));
+    } // end switch on command
+  } // end while more data
 }
 
+void setVolatileString(unsigned char *newString) {
+  // limit the copy to 
+  if (sizeof(newString) >= 39) { // sizeof does ptr len or string+null len??
+    strncpy((char *)&myVolatileStr, (char *)newString, 39);
+  } else {
+    strcpy((char *)&myVolatileStr, (char *)newString);
+  }  
+}
 
-void loopRefreshingDisplay() {
+unsigned char * getVolatileString(void) {
+  return &myVolatileStr;
+}
+
+void loopRefreshingDisplay(void) {
 
   // temporary holders for color data, for loading from pgm mem into buffer.
   u08 tempR;

@@ -14,11 +14,14 @@
 #include <string.h>
 #include <avr/eeprom.h>
 #include <avr/pgmspace.h>
+
+#include "global.h"
+#include "bufferchris.h"
 #include "uartchris.h"
 #include "commandprotocol.h"
 
 // do these need to be available across compile units? ie. in main?
-volatile char cmdBuffer[UART_RX_BUFFER_SIZE];
+volatile unsigned char cmdBuffer[UART_RX_BUFFER_SIZE];
 volatile u08 cmdReadyToProcess;
 
 volatile u08 rxCompleteFlag; // indicate that a command has been fully rx'd
@@ -30,7 +33,7 @@ volatile u08 rxCommandOverloaded; // state when we are addressed while already b
 u08 myAddress; // in-memory storage of EEPROM address.
 u08 customResponse; // if this is set, then don't send generic "ok" response
 
-char sprintbuf[80]; // output message buffer
+unsigned char sprintbuf[80]; // output message buffer
 
 /************************************************************************
  * Chain Command Handler routine to intercept UART receives in ISR
@@ -111,11 +114,16 @@ void myUartRx(unsigned char c) {
  * If the EEPROM is not set, default to the command protocol header
  * address, and also program it into the EEPROM on 1st boot.
  ************************************************************************/
-void initCommandProtocolAddr(void) {
-  myAddress = eeprom_read_byte((uint8_t*)0);
-  if (!myAddress) {
-    myAddress = CMD_UART_THIS_DEVICE_ADDRESS;
-    eeprom_write_byte((uint8_t*)0, myAddress);
+void initCommandProtocolAddr(u08 inAddr) {
+  myAddress = getCommandProtocolAddr();
+  // if value in memory is zero, something must be written
+  if (myAddress == 0) {
+    if (inAddr != 0) {
+      myAddress = inAddr;
+    } else {
+      myAddress = CMD_UART_THIS_DEVICE_ADDRESS;
+    }    
+    setCommandProtocolAddr(myAddress);
   }
 }
 
@@ -124,7 +132,7 @@ void initCommandProtocolAddr(void) {
  * Get this device's address from EEPROM location, and return it.
  ************************************************************************/
 u08 getCommandProtocolAddr(void) {
-  return (u08) eeprom_read_byte((uint8_t*)0);
+  return (u08) eeprom_read_byte((uint8_t*)CMD_EEPROM_ADDR_THIS_DEVICE_ADDR);
   
 }
 
@@ -139,7 +147,7 @@ u08 setCommandProtocolAddr(u08 newAddr) {
     return 1;
   }
   myAddress = newAddr;
-  eeprom_write_byte((uint8_t*)0, newAddr);
+  eeprom_write_byte((uint8_t*)CMD_EEPROM_ADDR_THIS_DEVICE_ADDR, newAddr);
   return 0;
 }
 
@@ -219,7 +227,7 @@ void endCmdProcessing(void) {
  * We need the argument passed by address so we can modify the
  * caller's storage.
  *********************************************************************/
-void getNextNonNumericChar(char **ppRxDataStr) {
+void pointToNextNonNumericChar(unsigned char **ppRxDataStr) {
  /* Count the digits. Numbers are 0x30 < n < 0x39 */
   while((**ppRxDataStr >= 0x30) & (**ppRxDataStr <= 0x39)) {
     (*ppRxDataStr)++;

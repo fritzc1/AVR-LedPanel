@@ -4,12 +4,14 @@
 #include <avr/io.h>
 #include <util/delay.h>
 #include <stdint.h>
+
+#include "global.h"
 #include "WS2812.h"
 
 int incmult(int);
 
-// define maximum brightness to fade to?
-#define MAX   50
+// define MAXVimum brightness to fade to?
+#define MAXV   50
 enum {S_R, S_O, S_G, S_B, S_Y, S_V, S_T};
 
 void Function2 () 
@@ -26,11 +28,11 @@ void Function2 ()
 		switch (state)
 		{
 			case S_R:
-			if ((val=val+1) <= MAX)
+			if ((val=val+1) <= MAXV)
 			{
 				if (!first_time)
 				{
-					/*set_color(buf, mult+5, val, MAX-val, MAX-val);*/
+					/*set_color(buf, mult+5, val, MAXV-val, MAXV-val);*/
 				}
 				set_color(buf, mult, val, val, val);
 			}
@@ -44,7 +46,7 @@ void Function2 ()
 			break;
 			
 			case S_O:
-			if ((val=val+1) <= MAX)
+			if ((val=val+1) <= MAXV)
 			{
 				set_color(buf, mult+1, 0, 0, 0);
 			}
@@ -56,9 +58,9 @@ void Function2 ()
 			break;
 			
 			case S_G:
-			if (++val <= MAX)
+			if (++val <= MAXV)
 			{
-				set_color(buf, mult+0, MAX-val, val, 0);
+				set_color(buf, mult+0, MAXV-val, val, 0);
 				set_color(buf, mult+1, 0, val, 0);
 			}
 			else
@@ -69,9 +71,9 @@ void Function2 ()
 			break;
 			
 			case S_B:
-			if (++val <= MAX)
+			if (++val <= MAXV)
 			{
-				set_color(buf, mult+1, 0, MAX-val, val);
+				set_color(buf, mult+1, 0, MAXV-val, val);
 				set_color(buf, mult+2, 0, 0, val);
 			}
 			else
@@ -82,9 +84,9 @@ void Function2 ()
 			break;
 			
 			case S_Y:
-			if (++val <= MAX)
+			if (++val <= MAXV)
 			{
-				set_color(buf, mult+2, val, 0, MAX-val);
+				set_color(buf, mult+2, val, 0, MAXV-val);
 				set_color(buf, mult+3, val, val, 0);
 			}
 			else
@@ -95,9 +97,9 @@ void Function2 ()
 			break;
 			
 			case S_V:
-			if (++val <= MAX)
+			if (++val <= MAXV)
 			{
-				set_color(buf, mult+3, MAX-val, MAX-val, val);
+				set_color(buf, mult+3, MAXV-val, MAXV-val, val);
 				set_color(buf, mult+4, val, 0, val);
 			}
 			else
@@ -108,9 +110,9 @@ void Function2 ()
 			break;
 			
 			case S_T:
-			if (++val <= MAX)
+			if (++val <= MAXV)
 			{
-				set_color(buf, mult+4, MAX-val, val, MAX-val);
+				set_color(buf, mult+4, MAXV-val, val, MAXV-val);
 				set_color(buf, mult+5, 0, val, val);
 			}
 			else

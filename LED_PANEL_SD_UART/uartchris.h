@@ -67,8 +67,7 @@
 #ifndef UART_H
 #define UART_H
 
-#include "global.h"
-#include "bufferchris.h"
+
 
 //! Default uart baud rate.
 /// This is the default speed after a uartInit() command,

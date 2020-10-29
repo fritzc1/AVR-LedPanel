@@ -6,8 +6,8 @@
  */ 
 
 
-#ifndef GLOBAL_H_
-#define GLOBAL_H_
+#ifndef GLOBAL_H
+#define GLOBAL_H
 
 // global AVRLIB defines
 #include "avrlibdefs.h"
@@ -22,10 +22,8 @@
 
 // useful in any library to clear interrupts and restore entry state
 #ifndef CRITICAL_SECTION_START
-#define CRITICAL_SECTION_START	unsigned char _sreg = SREG; cli()
+#define CRITICAL_SECTION_START	; unsigned char _sreg = SREG; cli()
 #define CRITICAL_SECTION_END	SREG = _sreg
 #endif
-
-
 
 #endif /* GLOBAL_H_ */

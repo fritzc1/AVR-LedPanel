@@ -1,10 +1,6 @@
 #ifndef _H_WS2812
 #define _H_WS2812
 
-
-#include "global.h"
-#include <stdint.h>
-
 // define the LED panel dimensions
 #define XBOUND 40
 #define YBOUND 11 // NOTE this is 1/2 the screen height. The screen is split into two strings of LEDs, an upper half and lower half.

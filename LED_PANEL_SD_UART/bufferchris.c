@@ -17,13 +17,8 @@
 
 #include <avr/io.h>
 #include <string.h>
+#include "global.h"
 #include "bufferchris.h"
-
-
-#ifndef CRITICAL_SECTION_START
-#define CRITICAL_SECTION_START	unsigned char _sreg = SREG; cli()
-#define CRITICAL_SECTION_END	SREG = _sreg
-#endif
 
 // global variables
 

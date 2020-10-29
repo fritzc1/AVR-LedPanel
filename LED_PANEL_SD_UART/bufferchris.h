@@ -35,8 +35,6 @@
 #ifndef BUFFER_H
 #define BUFFER_H
 
-#include "global.h"
-
 // structure/typdefs
 
 //! cBuffer structure
