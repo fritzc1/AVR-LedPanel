@@ -20,6 +20,8 @@
 #include "uartchris.h"
 #include "commandprotocol.h"
 
+#include <util/delay.h> // FOR DEBUGGING ONLY!!!
+
 // do these need to be available across compile units? ie. in main?
 volatile unsigned char cmdBuffer[UART_RX_BUFFER_SIZE];
 volatile u08 cmdReadyToProcess;
@@ -58,16 +60,15 @@ void initCmdHandler(void) {
  * 
  ************************************************************************/
 void myUartRx(unsigned char c) {
-  
   if (!rxAddrNext) { // if non-address byte (typical)
     // first, scan the char received for special trigger values.
-    switch (c)
-    {
+    switch (c) {
       case 0x24: // '$' command terminator byte (not included in cmd buffer!)
         if (rxAddressed) { // only take action if we were addressed
           // indicate that a cmd is fully received to initiate command processing
           rxCompleteFlag = TRUE; // allow mainline to process cmd now.
           rxAddressed = FALSE; // stop accumulating bytes into cmd buffer.
+          PORTD &= ~(1 << PIND5); // DEBUG TURN OFF LED INDICATOR
         }
         break;
       case 0x21: // '!' address byte next

@@ -45,11 +45,6 @@ unsigned short uartRxOverflow;		///< receive overflow counter
 	static unsigned char uartTxData[UART_TX_BUFFER_SIZE];
 #endif
 
-#ifndef CRITICAL_SECTION_START
-#define CRITICAL_SECTION_START	unsigned char _sreg = SREG; cli()
-#define CRITICAL_SECTION_END	SREG = _sreg
-#endif
-
 typedef void (*voidFuncPtru08)(unsigned char);
 volatile static voidFuncPtru08 UartRxFunc;
 
@@ -245,9 +240,9 @@ u08 uartSendBuffer(char *buffer, u16 nBytes) {
 		uartBufferedTx = TRUE;
     #ifdef UART_USE_RS485
     uart485OutputEnable();
-    #endif
-
     _delay_us(1);
+    #endif
+    
 		uartSendByte(first);
 		// return success
 		return TRUE;
@@ -278,7 +273,7 @@ UART_INTERRUPT_HANDLER(SIG_UART_DATA) {
 
 // UART Transmit Complete Interrupt Handler
 UART_INTERRUPT_HANDLER(SIG_UART_TRANS) {
-	
+	PORTD |= (1 << PIND5); // DEBUG TURN ON LED INDICATOR
 	//UDR0 = uartBufferedTx;
 	// check if buffered tx is enabled
 	if(uartBufferedTx)
@@ -331,10 +326,10 @@ UART_INTERRUPT_HANDLER(SIG_UART_TRANS) {
 UART_INTERRUPT_HANDLER(SIG_UART_RECV)
 {
 	u08 c;
-	
+	PORTD |= (1 << PIND5); // DEBUG TURN ON LED INDICATOR
 	// get received char
 	c = inb(UDR);
-
+  
 	// if there's a user function to handle this receive event
 	if(UartRxFunc)
 	{

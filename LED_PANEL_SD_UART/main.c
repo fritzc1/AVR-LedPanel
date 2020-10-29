@@ -740,13 +740,29 @@ int main(void) {
 	DDRD |= (1 << DDD3); // set PD3 to OUTPUT
 	DDRD |= (1 << DDD4); // set PD4 to OUTPUT
   
+  DDRD |= (1 << DDD5); // set PD4 to OUTPUT for testing - led blink
+  PORTD |= (1 << PIND5); // DEBUG TURN ON LED INDICATOR
+  _delay_ms(100);
+  PORTD &= ~(1 << PIND5); // DEBUG TURN OFF LED INDICATOR
+
+  /*************************
+   * UART initialization stuff
+   */
   uartInit();
-  uartSetBaudRate(9600);
+  //uartSetBaudRate(9600);
   
+  /*************************
+   * Command Protocol Library initialization stuff
+   */
+  // set library function to handle bytes received over UART (and other stuff)
+  initCmdHandler();
   // set address, if not already in eeprom
   initCommandProtocolAddr(CMD_UART_THIS_DEVICE_ADDRESS);
-
+  sprintf_P((char *)sprintbuf,PSTR("testing %d$"), 10);
+  uartSendBuffer((char *)sprintbuf, 10);
   
+  uartSendByte('a');PORTD |= (1 << PIND5); // DEBUG TURN ON LED INDICATOR
+  uartSendByte('b');
   /* Loop forever, handle uart messages if we get any */
   while (1) {
     u08 rc; 

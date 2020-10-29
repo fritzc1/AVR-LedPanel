@@ -100,7 +100,7 @@
 
 // define this key if you wish to use RS485 standard, 
 // multiple slave with output disabling
-#define UART_USE_RS485
+//#define UART_USE_RS485
 
 #ifdef UART_USE_RS485
   #define UARTRS485PORT PORTD
