@@ -273,7 +273,6 @@ UART_INTERRUPT_HANDLER(SIG_UART_DATA) {
 
 // UART Transmit Complete Interrupt Handler
 UART_INTERRUPT_HANDLER(SIG_UART_TRANS) {
-	PORTD |= (1 << PIND5); // DEBUG TURN ON LED INDICATOR
 	//UDR0 = uartBufferedTx;
 	// check if buffered tx is enabled
 	if(uartBufferedTx)
@@ -326,7 +325,6 @@ UART_INTERRUPT_HANDLER(SIG_UART_TRANS) {
 UART_INTERRUPT_HANDLER(SIG_UART_RECV)
 {
 	u08 c;
-	PORTD |= (1 << PIND5); // DEBUG TURN ON LED INDICATOR
 	// get received char
 	c = inb(UDR);
   

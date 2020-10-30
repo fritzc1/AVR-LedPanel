@@ -73,7 +73,7 @@ extern u08 customResponse; // if this is set, then don't send generic "ok" respo
 // the following vars are used to interact with uart receive ISR
 extern cBuffer uartRxBuffer;	// defined in uartchris.c
 extern unsigned short uartRxOverflow; // defined in uartchris.c
-extern unsigned char sprintbuf[80]; // output message buffer
+extern char sprintbuf[80]; // output message buffer
 
 #endif
 

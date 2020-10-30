@@ -23,7 +23,7 @@
 #include <util/delay.h> // FOR DEBUGGING ONLY!!!
 
 // do these need to be available across compile units? ie. in main?
-volatile unsigned char cmdBuffer[UART_RX_BUFFER_SIZE];
+volatile char cmdBuffer[UART_RX_BUFFER_SIZE];
 volatile u08 cmdReadyToProcess;
 
 volatile u08 rxCompleteFlag; // indicate that a command has been fully rx'd
@@ -35,7 +35,7 @@ volatile u08 rxCommandOverloaded; // state when we are addressed while already b
 u08 myAddress; // in-memory storage of EEPROM address.
 u08 customResponse; // if this is set, then don't send generic "ok" response
 
-unsigned char sprintbuf[80]; // output message buffer
+char sprintbuf[80]; // output message buffer
 
 /************************************************************************
  * Chain Command Handler routine to intercept UART receives in ISR
@@ -90,6 +90,9 @@ void myUartRx(unsigned char c) {
   else { // if this byte IS an address byte
     rxAddrNext = FALSE; // only one addr byte per cmd, so next one won't be.
     if (isMyAddress(c)) {
+      
+      PORTD |= (1 << PIND5); // DEBUG TURN ON LED INDICATOR
+      
       if (rxCommandProcessing) { // if we're already doing something, clear out
         // this should only happen if this device times out and the master can send another cmd
         // save the error state to print once the master finishes xmit

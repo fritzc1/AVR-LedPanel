@@ -758,11 +758,14 @@ int main(void) {
   initCmdHandler();
   // set address, if not already in eeprom
   initCommandProtocolAddr(CMD_UART_THIS_DEVICE_ADDRESS);
-  sprintf_P((char *)sprintbuf,PSTR("testing %d$"), 10);
-  uartSendBuffer((char *)sprintbuf, 10);
   
-  uartSendByte('a');PORTD |= (1 << PIND5); // DEBUG TURN ON LED INDICATOR
-  uartSendByte('b');
+  // Globally Enable Interrupts
+  // This MUST occur before ANY UART IO happens!!
+  sei();
+  
+  sprintf_P((char *)sprintbuf,PSTR("testing %d$"), 10);
+  uartSendBuffer(sprintbuf,strlen(sprintbuf));
+  
   /* Loop forever, handle uart messages if we get any */
   while (1) {
     u08 rc; 
@@ -796,7 +799,7 @@ void processCmd() {
   u08 rc; // return code from handler funcs
   // get a pointer to the data portion of RX buffer
   cBuffer* myRxBufferPtr;
-  unsigned char * myRxBufferDataPtr;
+  char * myRxBufferDataPtr;
   myRxBufferPtr = uartGetRxBuffer();
   myRxBufferDataPtr = myRxBufferPtr->dataptr;
   
@@ -819,6 +822,7 @@ void processCmd() {
         //; // "a label can only be a part of a statement" <= the following line declares a variable first
         CRITICAL_SECTION_START;
         setVolatileString(myRxBufferDataPtr);
+        myRxBufferDataPtr += strlen(myRxBufferDataPtr);
         CRITICAL_SECTION_END;
         break; // End 'b' command
        
