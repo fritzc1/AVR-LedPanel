@@ -15,21 +15,21 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY
   5 .debug_aranges 00000210  00000000  00000000  000010a0  2**3
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_info   00002602  00000000  00000000  000012b0  2**0
+  6 .debug_info   000025de  00000000  00000000  000012b0  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_abbrev 00000f26  00000000  00000000  000038b2  2**0
+  7 .debug_abbrev 00000f26  00000000  00000000  0000388e  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_line   00001a37  00000000  00000000  000047d8  2**0
+  8 .debug_line   00001a38  00000000  00000000  000047b4  2**0
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_frame  000004b0  00000000  00000000  00006210  2**2
+  9 .debug_frame  000004b0  00000000  00000000  000061ec  2**2
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_str    00009ab0  00000000  00000000  000066c0  2**0
+ 10 .debug_str    00009a95  00000000  00000000  0000669c  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_loc    000016af  00000000  00000000  00010170  2**0
+ 11 .debug_loc    000016af  00000000  00000000  00010131  2**0
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_ranges 00000218  00000000  00000000  0001181f  2**0
+ 12 .debug_ranges 00000218  00000000  00000000  000117e0  2**0
                   CONTENTS, READONLY, DEBUGGING
- 13 .debug_macro  000039aa  00000000  00000000  00011a37  2**0
+ 13 .debug_macro  000039ab  00000000  00000000  000119f8  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -350,7 +350,7 @@ void bufferClear(cBuffer* buffer, unsigned short size) {
  2c6:	80 e0       	ldi	r24, 0x00	; 0
  2c8:	90 e0       	ldi	r25, 0x00	; 0
  2ca:	0e 94 80 07 	call	0xf00	; 0xf00 <eeprom_write_byte>
- 2ce:	80 91 00 01 	lds	r24, 0x0100	; 0x800100 <_edata>
+ 2ce:	80 91 00 01 	lds	r24, 0x0100	; 0x800100 <__DATA_REGION_ORIGIN__>
  2d2:	81 11       	cpse	r24, r1
  2d4:	08 95       	ret
  2d6:	65 ea       	ldi	r22, 0xA5	; 165
@@ -358,7 +358,7 @@ void bufferClear(cBuffer* buffer, unsigned short size) {
  2da:	90 e0       	ldi	r25, 0x00	; 0
  2dc:	0e 94 80 07 	call	0xf00	; 0xf00 <eeprom_write_byte>
  2e0:	8f ef       	ldi	r24, 0xFF	; 255
- 2e2:	80 93 00 01 	sts	0x0100, r24	; 0x800100 <_edata>
+ 2e2:	80 93 00 01 	sts	0x0100, r24	; 0x800100 <__DATA_REGION_ORIGIN__>
  2e6:	08 95       	ret
 
 000002e8 <getCommandProtocolAddr>:
@@ -1162,10 +1162,10 @@ int main(void) {
  6e6:	10 92 02 01 	sts	0x0102, r1	; 0x800102 <UartRxFunc+0x1>
  6ea:	10 92 01 01 	sts	0x0101, r1	; 0x800101 <UartRxFunc>
  6ee:	88 ed       	ldi	r24, 0xD8	; 216
- 6f0:	80 93 c1 00 	sts	0x00C1, r24	; 0x8000c1 <__TEXT_REGION_LENGTH__+0x7e00c1>
+ 6f0:	80 93 c1 00 	sts	0x00C1, r24	; 0x8000c1 <__TEXT_REGION_LENGTH__+0x7f80c1>
  6f4:	83 e3       	ldi	r24, 0x33	; 51
- 6f6:	80 93 c4 00 	sts	0x00C4, r24	; 0x8000c4 <__TEXT_REGION_LENGTH__+0x7e00c4>
- 6fa:	10 92 c5 00 	sts	0x00C5, r1	; 0x8000c5 <__TEXT_REGION_LENGTH__+0x7e00c5>
+ 6f6:	80 93 c4 00 	sts	0x00C4, r24	; 0x8000c4 <__TEXT_REGION_LENGTH__+0x7f80c4>
+ 6fa:	10 92 c5 00 	sts	0x00C5, r1	; 0x8000c5 <__TEXT_REGION_LENGTH__+0x7f80c5>
  6fe:	8f ef       	ldi	r24, 0xFF	; 255
  700:	80 93 6f 07 	sts	0x076F, r24	; 0x80076f <uartReadyTx>
  704:	10 92 78 07 	sts	0x0778, r1	; 0x800778 <uartBufferedTx>
@@ -1275,7 +1275,7 @@ void uartSendByte(u08 txData) {
   uart485OutputEnable();
   #endif
 	outb(UDR0, txData);
- 78a:	f0 92 c6 00 	sts	0x00C6, r15	; 0x8000c6 <__TEXT_REGION_LENGTH__+0x7e00c6>
+ 78a:	f0 92 c6 00 	sts	0x00C6, r15	; 0x8000c6 <__TEXT_REGION_LENGTH__+0x7f80c6>
 	// set ready state to FALSE
 	uartReadyTx = FALSE;
  78e:	10 92 6f 07 	sts	0x076F, r1	; 0x80076f <uartReadyTx>
@@ -1356,7 +1356,7 @@ UART_INTERRUPT_HANDLER(SIG_UART_TRANS) {
 	if(uartBufferedTx)
  7dc:	80 91 78 07 	lds	r24, 0x0778	; 0x800778 <uartBufferedTx>
  7e0:	88 23       	and	r24, r24
- 7e2:	99 f1       	breq	.+102    	; 0x84a <__vector_20+0x88>
+ 7e2:	99 f1       	breq	.+102    	; 0x84a <__DATA_REGION_LENGTH__+0x4a>
 	{
 		
 		// check if there's data left in the buffer
@@ -1365,7 +1365,7 @@ UART_INTERRUPT_HANDLER(SIG_UART_TRANS) {
  7e8:	30 91 80 07 	lds	r19, 0x0780	; 0x800780 <uartTxBuffer+0x5>
  7ec:	21 15       	cp	r18, r1
  7ee:	31 05       	cpc	r19, r1
- 7f0:	e1 f1       	breq	.+120    	; 0x86a <__vector_20+0xa8>
+ 7f0:	e1 f1       	breq	.+120    	; 0x86a <__DATA_REGION_LENGTH__+0x6a>
 		{
 			// send byte from top of buffer
       /* The Following section is expanded from bufferGetFromFront() */
@@ -1394,7 +1394,7 @@ UART_INTERRUPT_HANDLER(SIG_UART_TRANS) {
  81e:	50 91 7e 07 	lds	r21, 0x077E	; 0x80077e <uartTxBuffer+0x3>
  822:	84 17       	cp	r24, r20
  824:	95 07       	cpc	r25, r21
- 826:	30 f0       	brcs	.+12     	; 0x834 <__vector_20+0x72>
+ 826:	30 f0       	brcs	.+12     	; 0x834 <__DATA_REGION_LENGTH__+0x34>
 				{
 					uartTxBuffer.dataindex -= uartTxBuffer.size;
  828:	84 1b       	sub	r24, r20
@@ -1410,8 +1410,8 @@ UART_INTERRUPT_HANDLER(SIG_UART_TRANS) {
 			}
 			outb(UDR0, uartTxIntData);
  840:	80 91 7a 07 	lds	r24, 0x077A	; 0x80077a <uartTxIntData>
- 844:	80 93 c6 00 	sts	0x00C6, r24	; 0x8000c6 <__TEXT_REGION_LENGTH__+0x7e00c6>
- 848:	03 c0       	rjmp	.+6      	; 0x850 <__vector_20+0x8e>
+ 844:	80 93 c6 00 	sts	0x00C6, r24	; 0x8000c6 <__TEXT_REGION_LENGTH__+0x7f80c6>
+ 848:	03 c0       	rjmp	.+6      	; 0x850 <__DATA_REGION_LENGTH__+0x50>
 	}
 	else
 	{
@@ -1449,7 +1449,7 @@ UART_INTERRUPT_HANDLER(SIG_UART_TRANS) {
 			uartReadyTx = TRUE;
  86e:	8f ef       	ldi	r24, 0xFF	; 255
  870:	80 93 6f 07 	sts	0x076F, r24	; 0x80076f <uartReadyTx>
- 874:	ed cf       	rjmp	.-38     	; 0x850 <__vector_20+0x8e>
+ 874:	ed cf       	rjmp	.-38     	; 0x850 <__DATA_REGION_LENGTH__+0x50>
 
 00000876 <__vector_18>:
 	}
@@ -1478,7 +1478,7 @@ UART_INTERRUPT_HANDLER(SIG_UART_RECV)
 	u08 c;
 	// get received char
 	c = inb(UDR);
- 898:	80 91 c6 00 	lds	r24, 0x00C6	; 0x8000c6 <__TEXT_REGION_LENGTH__+0x7e00c6>
+ 898:	80 91 c6 00 	lds	r24, 0x00C6	; 0x8000c6 <__TEXT_REGION_LENGTH__+0x7f80c6>
   
 	// if there's a user function to handle this receive event
 	if(UartRxFunc)
