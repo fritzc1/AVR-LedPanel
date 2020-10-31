@@ -2,6 +2,11 @@
  * LED Display Panel
  * Now with UART interface to PC!
  * 
+ *
+ * Importing Command Protocol Library Notes:
+ * 1. add sei() to enable the interrupts globally, or it won't work!
+ * 2. Library variables shouldn't be exposed to the main pgm. Use get() and set() type funcs.
+ * 3. Add an example of usage to the library header (commandprotocol.h)
  * 
  ************************************************************************/
 
@@ -741,9 +746,17 @@ int main(void) {
 	DDRD |= (1 << DDD4); // set PD4 to OUTPUT
   
   DDRD |= (1 << DDD5); // set PD4 to OUTPUT for testing - led blink
-  PORTD |= (1 << PIND5); // DEBUG TURN ON LED INDICATOR
+  DDRD |= (1 << DDD6); // set PD4 to OUTPUT for testing - led blink
+  DDRD |= (1 << DDD7); // set PD4 to OUTPUT for testing - led blink
+  PORTD |= (1 << PIND5); // DEBUG TURN ON BLUE LED INDICATOR
   _delay_ms(100);
-  PORTD &= ~(1 << PIND5); // DEBUG TURN OFF LED INDICATOR
+  PORTD &= ~(1 << PIND5); // DEBUG TURN OFF BLUE LED INDICATOR
+  PORTD |= (1 << PIND6); // DEBUG TURN ON YELLOW LED INDICATOR
+  _delay_ms(100);
+  PORTD &= ~(1 << PIND6); // DEBUG TURN OFF YELLOW LED INDICATOR
+  PORTD |= (1 << PIND7); // DEBUG TURN ON RED LED INDICATOR
+  _delay_ms(100);
+  PORTD &= ~(1 << PIND7); // DEBUG TURN OFF RED LED INDICATOR
 
   /*************************
    * UART initialization stuff
@@ -755,27 +768,24 @@ int main(void) {
    * Command Protocol Library initialization stuff
    */
   // set library function to handle bytes received over UART (and other stuff)
-  initCmdHandler();
-  // set address, if not already in eeprom
-  initCommandProtocolAddr(CMD_UART_THIS_DEVICE_ADDRESS);
+  initCommandProtocolLibrary();
   
   // Globally Enable Interrupts
   // This MUST occur before ANY UART IO happens!!
   sei();
   
-  sprintf_P((char *)sprintbuf,PSTR("testing %d$"), 10);
+  sprintf_P((char *)sprintbuf,PSTR("testing %d$"), CMDPROT_MY_ADDRESS);
   uartSendBuffer(sprintbuf,strlen(sprintbuf));
   
   /* Loop forever, handle uart messages if we get any */
-  while (1) {
-    u08 rc; 
-    
-    if (rxCompleteFlag) {
+  while (1) { 
+    if (isCommandReady()) {
+      PORTD |= (1 << PIND7); // DEBUG TURN ON RED LED INDICATOR
       beginCmdProcessing(); // follow command protocol
       processCmd(); // interpret the current waiting command
       endCmdProcessing(); // follow command protocol
     }
-    
+    PORTD &= ~(1 << PIND7); // DEBUG TURN OFF RED LED INDICATOR
   }
   loopRefreshingDisplay(); // put the old loop in a subroutine
 
@@ -809,9 +819,8 @@ void processCmd() {
       case 'a':
         rc = setCommandProtocolAddr(atoi((char *)myRxBufferDataPtr));
         if (rc) {
-          customResponse = TRUE;
+          sendCustomResponse();
           sprintf_P(sprintbuf,PSTR("err-badaddr$"));
-          sendMsg();
         }
         // use EEPROM to store address between powerups. Only reprogram on non-global addr.
         pointToNextNonNumericChar(&myRxBufferDataPtr);
@@ -829,15 +838,14 @@ void processCmd() {
       // Get info
       case 'g': case 'G':
         // Indicate to cmd protocol that we are sending a custom ack
-        customResponse = TRUE;
+        sendCustomResponse();
         // select sub-command
         switch(*myRxBufferDataPtr++) {
           case 'a': case 'A':
-            sprintf_P(sprintbuf, PSTR("g%d$"), getCommandProtocolAddr());
+            sprintf_P(sprintbuf, PSTR("g0x%02x$"), getCommandProtocolAddr());
             // SPECIAL CASE!! we WANT to get the address back on a global command!
             // You can only have ONE device on the net for this to work. Otherwise, user beware!
-            rxAddrGlobal = FALSE;
-            sendMsg();
+            forceGlobalCmdResponse();
             break;
           
           case 'b': case 'B':
@@ -852,7 +860,7 @@ void processCmd() {
         break; // end 'g' command
         
       default:
-        customResponse = TRUE;
+        sendCustomResponse();
         sprintf_P(sprintbuf, PSTR("err-cmd$"));
     } // end switch on command
   } // end while more data

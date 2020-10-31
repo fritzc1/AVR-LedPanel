@@ -332,7 +332,9 @@ UART_INTERRUPT_HANDLER(SIG_UART_RECV)
 	if(UartRxFunc)
 	{
 		// call it and pass the received data
+    PORTD |= (1 << PIND6); // DEBUG TURN ON YELLOW LED INDICATOR
 		UartRxFunc(c);
+    PORTD &= ~(1 << PIND6); // DEBUG TURN OFF YELLOW LED INDICATOR
 	}
 	else
 	{

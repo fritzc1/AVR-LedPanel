@@ -31,27 +31,33 @@
 
 #include "global.h"
 
-#define CMD_UART_THIS_DEVICE_ADDRESS	0x01
+#define CMDPROT_MY_ADDRESS	0x31 // ASCII "1"
         // this (dec 20) was the addr of the last device programmed
         //Addrs so far:
         // 10 - 17: Recessed lights in soffits
         // 18 - 19: Step lights
         // 20 ?
-#define CMD_UART_GLOBAL_CMD_ADDR		0x00
+#define CMDPROT_GLOBAL_ADDRESS		0x00
 
-// the location in EEPROM from which to load/store address byte
-#define CMD_EEPROM_ADDR_THIS_DEVICE_ADDR		0x00
+// location in EEPROM from which to load/store address byte
+#define CMDPROT_EEPROMADDR_MY_ADDRESS		0x00
+// location in EEPROM to store pattern when address has been initialized
+#define CMDPROT_EEPROMADDR_ADDR_INIT		0x01
+// pattern to store when address is initialized on first power-on
+#define CMDPROT_ADDRESS_INITIALIZED     0xA5
 
-void initCommandProtocolAddr(u08);
+void initCommandProtocolLibrary(void);
 u08 setCommandProtocolAddr(u08);
 u08 getCommandProtocolAddr(void);
-void initCmdHandler(void);
-void myUartRx(unsigned char);
-u08 isMyAddress(u08);
-u08 isGlobalAddress(u08);
-void sendMsg(void);
+
+u08 isCommandReady(void);
 void beginCmdProcessing(void);
 void endCmdProcessing(void);
+
+void sendMsg(void);
+void sendCustomResponse(void);
+void forceGlobalCmdResponse(void);
+
 // used by command processors, advances the pointer over ASCII numbers. pass the address of your char *
 void pointToNextNonNumericChar(unsigned char **);
 
