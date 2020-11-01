@@ -19,11 +19,8 @@
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
-
 #include "global.h"
-#include "bufferchris.h"
 #include "uartchris.h"
-
 #include <util/delay.h> // depends on FCPU in global.h
 
 // UART global variables

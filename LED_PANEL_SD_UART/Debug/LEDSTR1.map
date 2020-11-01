@@ -44,7 +44,6 @@ uartReadyTx         0x1               uartchris.o
 rxAddressed         0x1               commandprotocol.o
 flg_forceGlobalCmdResponse
                     0x1               commandprotocol.o
-customResponse      0x1               commandprotocol.o
 cmdBuffer           0x40              commandprotocol.o
 uartRxBuffer        0x8               uartchris.o
 int_flag            0x1               main.o
@@ -60,8 +59,8 @@ rxCompleteFlag      0x1               commandprotocol.o
 myVolatileStr       0x28              main.o
 uartTxIntData       0x1               uartchris.o
 rxAddrGlobal        0x1               commandprotocol.o
-sprintbuf           0x50              commandprotocol.o
 uartTxBuffer        0x8               uartchris.o
+cmdprotprintbuf     0x50              commandprotocol.o
 uartRxOverflow      0x2               uartchris.o
 rxCommandProcessing
                     0x1               commandprotocol.o
@@ -133,6 +132,7 @@ Discarded input sections
  .text          0x00000000        0x0 commandprotocol.o
  .data          0x00000000        0x0 commandprotocol.o
  .bss           0x00000000        0x0 commandprotocol.o
+ .text.sendMsg  0x00000000       0xa0 commandprotocol.o
  .text.initCommandProtocolAddr
                 0x00000000       0x46 commandprotocol.o
  .text.isAddressInitialized
@@ -230,7 +230,6 @@ Discarded input sections
  .debug_macro   0x00000000       0x4c main.o
  .debug_macro   0x00000000       0x1c main.o
  .debug_macro   0x00000000       0x92 main.o
- .debug_macro   0x00000000       0x28 main.o
  .debug_macro   0x00000000       0x10 main.o
  .debug_macro   0x00000000      0x160 main.o
  .text          0x00000000       0x92 output_grb.o
@@ -390,7 +389,6 @@ Discarded input sections
  .debug_macro   0x00000000       0x5e uartchris.o
  .debug_macro   0x00000000       0x4c uartchris.o
  .debug_macro   0x00000000       0x1c uartchris.o
- .debug_macro   0x00000000       0x92 uartchris.o
  .debug_macro   0x00000000       0x10 uartchris.o
  .group         0x00000000        0x8 WS2812.o
  .group         0x00000000        0x8 WS2812.o
@@ -683,7 +681,7 @@ END GROUP
 .rela.plt
  *(.rela.plt)
 
-.text           0x00000000      0xf8e
+.text           0x00000000      0xf42
  *(.vectors)
  .vectors       0x00000000       0x68 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/ATmega_DFP/1.5.362/gcc/dev/atmega328p/avr5/crtatmega328p.o
                 0x00000000                __vector_default
@@ -699,47 +697,47 @@ END GROUP
  *libprintf_flt.a:*(.progmem.data)
  *libc.a:*(.progmem.data)
  *(.progmem*)
- .progmem.data.__c.2446
-                0x00000068        0x3 commandprotocol.o
- .progmem.data.__c.2581
-                0x0000006b        0x9 main.o
+ .progmem.data.__c.2419
+                0x00000068        0x2 commandprotocol.o
  .progmem.data.__c.2578
-                0x00000074        0xf main.o
+                0x0000006a        0x9 main.o
  .progmem.data.__c.2575
-                0x00000083        0x5 main.o
- .progmem.data.__c.2570
-                0x00000088        0x9 main.o
- .progmem.data.__c.2560
-                0x00000091        0xd main.o
- .progmem.data.__c.2551
-                0x0000009e        0xc main.o
-                0x000000aa                . = ALIGN (0x2)
+                0x00000073        0xf main.o
+ .progmem.data.__c.2572
+                0x00000082        0x5 main.o
+ .progmem.data.__c.2567
+                0x00000087        0x9 main.o
+ .progmem.data.__c.2557
+                0x00000090        0xc main.o
+ .progmem.data.__c.2548
+                0x0000009c        0xc main.o
+                0x000000a8                . = ALIGN (0x2)
  *(.jumptables)
  *(.jumptables*)
  *(.lowtext)
  *(.lowtext*)
-                0x000000aa                __ctors_start = .
+                0x000000a8                __ctors_start = .
  *(.ctors)
-                0x000000aa                __ctors_end = .
-                0x000000aa                __dtors_start = .
+                0x000000a8                __ctors_end = .
+                0x000000a8                __dtors_start = .
  *(.dtors)
-                0x000000aa                __dtors_end = .
+                0x000000a8                __dtors_end = .
  SORT(*)(.ctors)
  SORT(*)(.dtors)
  *(.init0)
- .init0         0x000000aa        0x0 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/ATmega_DFP/1.5.362/gcc/dev/atmega328p/avr5/crtatmega328p.o
-                0x000000aa                __init
+ .init0         0x000000a8        0x0 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/ATmega_DFP/1.5.362/gcc/dev/atmega328p/avr5/crtatmega328p.o
+                0x000000a8                __init
  *(.init0)
  *(.init1)
  *(.init1)
  *(.init2)
- .init2         0x000000aa        0xc C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/ATmega_DFP/1.5.362/gcc/dev/atmega328p/avr5/crtatmega328p.o
+ .init2         0x000000a8        0xc C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/ATmega_DFP/1.5.362/gcc/dev/atmega328p/avr5/crtatmega328p.o
  *(.init2)
  *(.init3)
  *(.init3)
  *(.init4)
- .init4         0x000000b6       0x10 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_clear_bss.o)
-                0x000000b6                __do_clear_bss
+ .init4         0x000000b4       0x10 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_clear_bss.o)
+                0x000000b4                __do_clear_bss
  *(.init4)
  *(.init5)
  *(.init5)
@@ -750,154 +748,149 @@ END GROUP
  *(.init8)
  *(.init8)
  *(.init9)
- .init9         0x000000c6        0x8 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/ATmega_DFP/1.5.362/gcc/dev/atmega328p/avr5/crtatmega328p.o
+ .init9         0x000000c4        0x8 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/ATmega_DFP/1.5.362/gcc/dev/atmega328p/avr5/crtatmega328p.o
  *(.init9)
  *(.text)
- .text          0x000000ce        0x4 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/ATmega_DFP/1.5.362/gcc/dev/atmega328p/avr5/crtatmega328p.o
-                0x000000ce                __vector_22
-                0x000000ce                __vector_1
-                0x000000ce                __vector_24
-                0x000000ce                __vector_12
-                0x000000ce                __bad_interrupt
-                0x000000ce                __vector_6
-                0x000000ce                __vector_3
-                0x000000ce                __vector_23
-                0x000000ce                __vector_25
-                0x000000ce                __vector_11
-                0x000000ce                __vector_13
-                0x000000ce                __vector_17
-                0x000000ce                __vector_7
-                0x000000ce                __vector_5
-                0x000000ce                __vector_4
-                0x000000ce                __vector_9
-                0x000000ce                __vector_2
-                0x000000ce                __vector_21
-                0x000000ce                __vector_15
-                0x000000ce                __vector_8
-                0x000000ce                __vector_14
-                0x000000ce                __vector_10
-                0x000000ce                __vector_16
-                0x000000d2                . = ALIGN (0x2)
+ .text          0x000000cc        0x4 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/ATmega_DFP/1.5.362/gcc/dev/atmega328p/avr5/crtatmega328p.o
+                0x000000cc                __vector_22
+                0x000000cc                __vector_1
+                0x000000cc                __vector_24
+                0x000000cc                __vector_12
+                0x000000cc                __bad_interrupt
+                0x000000cc                __vector_6
+                0x000000cc                __vector_3
+                0x000000cc                __vector_23
+                0x000000cc                __vector_25
+                0x000000cc                __vector_11
+                0x000000cc                __vector_13
+                0x000000cc                __vector_17
+                0x000000cc                __vector_7
+                0x000000cc                __vector_5
+                0x000000cc                __vector_4
+                0x000000cc                __vector_9
+                0x000000cc                __vector_2
+                0x000000cc                __vector_21
+                0x000000cc                __vector_15
+                0x000000cc                __vector_8
+                0x000000cc                __vector_14
+                0x000000cc                __vector_10
+                0x000000cc                __vector_16
+                0x000000d0                . = ALIGN (0x2)
  *(.text.*)
  .text.bufferInit
-                0x000000d2       0x1a bufferchris.o
-                0x000000d2                bufferInit
+                0x000000d0       0x1a bufferchris.o
+                0x000000d0                bufferInit
  .text.bufferAddToEnd
-                0x000000ec       0x42 bufferchris.o
-                0x000000ec                bufferAddToEnd
+                0x000000ea       0x42 bufferchris.o
+                0x000000ea                bufferAddToEnd
  .text.bufferClear
-                0x0000012e       0x1a bufferchris.o
-                0x0000012e                bufferClear
+                0x0000012c       0x1a bufferchris.o
+                0x0000012c                bufferClear
  .text.myUartRx
-                0x00000148      0x13a commandprotocol.o
-                0x00000148                myUartRx
+                0x00000146      0x142 commandprotocol.o
+                0x00000146                myUartRx
  .text.initCommandProtocolLibrary
-                0x00000282       0x66 commandprotocol.o
-                0x00000282                initCommandProtocolLibrary
+                0x00000288       0x66 commandprotocol.o
+                0x00000288                initCommandProtocolLibrary
  .text.getCommandProtocolAddr
-                0x000002e8        0x8 commandprotocol.o
-                0x000002e8                getCommandProtocolAddr
+                0x000002ee        0x8 commandprotocol.o
+                0x000002ee                getCommandProtocolAddr
  .text.setCommandProtocolAddr
-                0x000002f0       0x1a commandprotocol.o
-                0x000002f0                setCommandProtocolAddr
+                0x000002f6       0x1a commandprotocol.o
+                0x000002f6                setCommandProtocolAddr
  .text.isCommandReady
-                0x0000030a       0x10 commandprotocol.o
-                0x0000030a                isCommandReady
- .text.sendMsg  0x0000031a       0x56 commandprotocol.o
-                0x0000031a                sendMsg
- .text.forceGlobalCmdResponse
-                0x00000370        0x8 commandprotocol.o
-                0x00000370                forceGlobalCmdResponse
- .text.sendCustomResponse
-                0x00000378        0x8 commandprotocol.o
-                0x00000378                sendCustomResponse
+                0x00000310       0x10 commandprotocol.o
+                0x00000310                isCommandReady
  .text.beginCmdProcessing
-                0x00000380        0xc commandprotocol.o
-                0x00000380                beginCmdProcessing
+                0x00000320        0xc commandprotocol.o
+                0x00000320                beginCmdProcessing
  .text.endCmdProcessing
-                0x0000038c       0x82 commandprotocol.o
-                0x0000038c                endCmdProcessing
+                0x0000032c       0xa6 commandprotocol.o
+                0x0000032c                endCmdProcessing
  .text.pointToNextNonNumericChar
-                0x0000040e       0x2c commandprotocol.o
-                0x0000040e                pointToNextNonNumericChar
+                0x000003d2       0x2c commandprotocol.o
+                0x000003d2                pointToNextNonNumericChar
+ .text.forceGlobalCmdResponse
+                0x000003fe        0x8 commandprotocol.o
+                0x000003fe                forceGlobalCmdResponse
  .text.processCmd
-                0x0000043a      0x1d0 main.o
-                0x0000043a                processCmd
+                0x00000406      0x1b8 main.o
+                0x00000406                processCmd
  .text.startup.main
-                0x0000060a       0xb6 main.o
-                0x0000060a                main
+                0x000005be       0xb6 main.o
+                0x000005be                main
  .text.uartInit
-                0x000006c0       0x56 uartchris.o
-                0x000006c0                uartInit
+                0x00000674       0x56 uartchris.o
+                0x00000674                uartInit
  .text.uartSetRxHandler
-                0x00000716        0xa uartchris.o
-                0x00000716                uartSetRxHandler
+                0x000006ca        0xa uartchris.o
+                0x000006ca                uartSetRxHandler
  .text.uartGetRxBuffer
-                0x00000720        0x6 uartchris.o
-                0x00000720                uartGetRxBuffer
+                0x000006d4        0x6 uartchris.o
+                0x000006d4                uartGetRxBuffer
  .text.uartSendBuffer
-                0x00000726       0x88 uartchris.o
-                0x00000726                uartSendBuffer
+                0x000006da       0x88 uartchris.o
+                0x000006da                uartSendBuffer
  .text.__vector_19
-                0x000007ae       0x14 uartchris.o
-                0x000007ae                __vector_19
+                0x00000762       0x14 uartchris.o
+                0x00000762                __vector_19
  .text.__vector_20
-                0x000007c2       0xb4 uartchris.o
-                0x000007c2                __vector_20
+                0x00000776       0xb4 uartchris.o
+                0x00000776                __vector_20
  .text.__vector_18
-                0x00000876       0x84 uartchris.o
-                0x00000876                __vector_18
+                0x0000082a       0x84 uartchris.o
+                0x0000082a                __vector_18
  .text.libgcc.div
-                0x000008fa       0x28 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_udivmodhi4.o)
-                0x000008fa                __udivmodhi4
+                0x000008ae       0x28 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_udivmodhi4.o)
+                0x000008ae                __udivmodhi4
  .text.avr-libc
-                0x00000922       0x3c c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr5\libc.a(atoi.o)
-                0x00000922                atoi
+                0x000008d6       0x3c c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr5\libc.a(atoi.o)
+                0x000008d6                atoi
  .text.avr-libc
-                0x0000095e        0xe c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr5\libc.a(memset.o)
-                0x0000095e                memset
+                0x00000912        0xe c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr5\libc.a(memset.o)
+                0x00000912                memset
  .text.avr-libc
-                0x0000096c        0xe c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr5\libc.a(strcpy.o)
-                0x0000096c                strcpy
+                0x00000920        0xe c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr5\libc.a(strcpy.o)
+                0x00000920                strcpy
  .text.avr-libc
-                0x0000097a       0x10 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr5\libc.a(mul10.o)
-                0x0000097a                __mulhi_const_10
+                0x0000092e       0x10 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr5\libc.a(mul10.o)
+                0x0000092e                __mulhi_const_10
  .text.avr-libc
-                0x0000098a       0x44 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr5\libc.a(sprintf_p.o)
-                0x0000098a                sprintf_P
+                0x0000093e       0x44 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr5\libc.a(sprintf_p.o)
+                0x0000093e                sprintf_P
  .text.avr-libc
-                0x000009ce      0x3c2 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr5\libc.a(vfprintf_std.o)
-                0x000009ce                vfprintf
+                0x00000982      0x3c2 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr5\libc.a(vfprintf_std.o)
+                0x00000982                vfprintf
  .text.avr-libc
-                0x00000d90       0x16 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr5\libc.a(strnlen_P.o)
-                0x00000d90                strnlen_P
+                0x00000d44       0x16 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr5\libc.a(strnlen_P.o)
+                0x00000d44                strnlen_P
  .text.avr-libc
-                0x00000da6       0x16 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr5\libc.a(strnlen.o)
-                0x00000da6                strnlen
+                0x00000d5a       0x16 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr5\libc.a(strnlen.o)
+                0x00000d5a                strnlen
  .text.avr-libc
-                0x00000dbc       0x78 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr5\libc.a(fputc.o)
-                0x00000dbc                fputc
+                0x00000d70       0x78 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr5\libc.a(fputc.o)
+                0x00000d70                fputc
  .text.avr-libc
-                0x00000e34       0xbc c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr5\libc.a(ultoa_invert.o)
-                0x00000e34                __ultoa_invert
+                0x00000de8       0xbc c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr5\libc.a(ultoa_invert.o)
+                0x00000de8                __ultoa_invert
  .text.avr-libc
-                0x00000ef0       0x10 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/ATmega_DFP/1.5.362/gcc/dev/atmega328p/avr5\libatmega328p.a(eerd_byte.o)
-                0x00000ef0                eeprom_read_byte
+                0x00000ea4       0x10 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/ATmega_DFP/1.5.362/gcc/dev/atmega328p/avr5\libatmega328p.a(eerd_byte.o)
+                0x00000ea4                eeprom_read_byte
  .text.avr-libc
-                0x00000f00       0x1c C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/ATmega_DFP/1.5.362/gcc/dev/atmega328p/avr5\libatmega328p.a(eewr_byte.o)
-                0x00000f00                eeprom_write_byte
-                0x00000f02                eeprom_write_r18
+                0x00000eb4       0x1c C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/ATmega_DFP/1.5.362/gcc/dev/atmega328p/avr5\libatmega328p.a(eewr_byte.o)
+                0x00000eb4                eeprom_write_byte
+                0x00000eb6                eeprom_write_r18
  .text.libgcc.prologue
-                0x00000f1c       0x38 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_prologue.o)
-                0x00000f1c                __prologue_saves__
+                0x00000ed0       0x38 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_prologue.o)
+                0x00000ed0                __prologue_saves__
  .text.libgcc.prologue
-                0x00000f54       0x36 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_epilogue.o)
-                0x00000f54                __epilogue_restores__
-                0x00000f8a                . = ALIGN (0x2)
+                0x00000f08       0x36 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_epilogue.o)
+                0x00000f08                __epilogue_restores__
+                0x00000f3e                . = ALIGN (0x2)
  *(.fini9)
- .fini9         0x00000f8a        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
-                0x00000f8a                _exit
-                0x00000f8a                exit
+ .fini9         0x00000f3e        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
+                0x00000f3e                _exit
+                0x00000f3e                exit
  *(.fini9)
  *(.fini8)
  *(.fini8)
@@ -916,11 +909,11 @@ END GROUP
  *(.fini1)
  *(.fini1)
  *(.fini0)
- .fini0         0x00000f8a        0x4 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
+ .fini0         0x00000f3e        0x4 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
  *(.fini0)
-                0x00000f8e                _etext = .
+                0x00000f42                _etext = .
 
-.data           0x00800100        0x0 load address 0x00000f8e
+.data           0x00800100        0x0 load address 0x00000f42
                 [!provide]                PROVIDE (__data_start, .)
  *(.data)
  *(.data*)
@@ -932,11 +925,11 @@ END GROUP
                 0x00800100                _edata = .
                 [!provide]                PROVIDE (__data_end, .)
 
-.bss            0x00800100      0x685
+.bss            0x00800100      0x684
                 0x00800100                PROVIDE (__bss_start, .)
  *(.bss)
  *(.bss*)
- .bss.multiWriteBlock.2417
+ .bss.multiWriteBlock.2433
                 0x00800100        0x1 commandprotocol.o
  .bss.UartRxFunc
                 0x00800101        0x2 uartchris.o
@@ -945,40 +938,39 @@ END GROUP
  .bss.uartRxData
                 0x00800143       0x40 uartchris.o
  *(COMMON)
- COMMON         0x00800183       0x99 commandprotocol.o
+ COMMON         0x00800183       0x98 commandprotocol.o
                 0x00800183                rxAddressed
                 0x00800184                flg_forceGlobalCmdResponse
-                0x00800185                customResponse
-                0x00800186                cmdBuffer
-                0x008001c6                rxCommandOverloaded
-                0x008001c7                myAddress
-                0x008001c8                rxAddrNext
-                0x008001c9                rxCompleteFlag
-                0x008001ca                rxAddrGlobal
-                0x008001cb                sprintbuf
-                0x0080021b                rxCommandProcessing
- COMMON         0x0080021c      0x553 main.o
-                0x0080021c                int_flag
-                0x0080021d                bufindex
-                0x0080021f                buf
-                0x00800747                myVolatileStr
- COMMON         0x0080076f       0x16 uartchris.o
-                0x0080076f                uartReadyTx
-                0x00800770                uartRxBuffer
-                0x00800778                uartBufferedTx
-                0x00800779                uartRxIntData
-                0x0080077a                uartTxIntData
-                0x0080077b                uartTxBuffer
-                0x00800783                uartRxOverflow
-                0x00800785                PROVIDE (__bss_end, .)
-                0x00000f8e                __data_load_start = LOADADDR (.data)
-                0x00000f8e                __data_load_end = (__data_load_start + SIZEOF (.data))
+                0x00800185                cmdBuffer
+                0x008001c5                rxCommandOverloaded
+                0x008001c6                myAddress
+                0x008001c7                rxAddrNext
+                0x008001c8                rxCompleteFlag
+                0x008001c9                rxAddrGlobal
+                0x008001ca                cmdprotprintbuf
+                0x0080021a                rxCommandProcessing
+ COMMON         0x0080021b      0x553 main.o
+                0x0080021b                int_flag
+                0x0080021c                bufindex
+                0x0080021e                buf
+                0x00800746                myVolatileStr
+ COMMON         0x0080076e       0x16 uartchris.o
+                0x0080076e                uartReadyTx
+                0x0080076f                uartRxBuffer
+                0x00800777                uartBufferedTx
+                0x00800778                uartRxIntData
+                0x00800779                uartTxIntData
+                0x0080077a                uartTxBuffer
+                0x00800782                uartRxOverflow
+                0x00800784                PROVIDE (__bss_end, .)
+                0x00000f42                __data_load_start = LOADADDR (.data)
+                0x00000f42                __data_load_end = (__data_load_start + SIZEOF (.data))
 
-.noinit         0x00800785        0x0
+.noinit         0x00800784        0x0
                 [!provide]                PROVIDE (__noinit_start, .)
  *(.noinit*)
                 [!provide]                PROVIDE (__noinit_end, .)
-                0x00800785                _end = .
+                0x00800784                _end = .
                 [!provide]                PROVIDE (__heap_start, .)
 
 .eeprom         0x00810000        0x0
@@ -1050,53 +1042,53 @@ END GROUP
 .debug_sfnames
  *(.debug_sfnames)
 
-.debug_aranges  0x00000000      0x210
+.debug_aranges  0x00000000      0x208
  *(.debug_aranges)
  .debug_aranges
                 0x00000000       0x58 bufferchris.o
  .debug_aranges
-                0x00000058       0x98 commandprotocol.o
+                0x00000058       0x90 commandprotocol.o
  .debug_aranges
-                0x000000f0       0x40 main.o
+                0x000000e8       0x40 main.o
  .debug_aranges
-                0x00000130       0xa0 uartchris.o
+                0x00000128       0xa0 uartchris.o
  .debug_aranges
-                0x000001d0       0x20 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/ATmega_DFP/1.5.362/gcc/dev/atmega328p/avr5\libatmega328p.a(eerd_byte.o)
+                0x000001c8       0x20 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/ATmega_DFP/1.5.362/gcc/dev/atmega328p/avr5\libatmega328p.a(eerd_byte.o)
  .debug_aranges
-                0x000001f0       0x20 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/ATmega_DFP/1.5.362/gcc/dev/atmega328p/avr5\libatmega328p.a(eewr_byte.o)
+                0x000001e8       0x20 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/ATmega_DFP/1.5.362/gcc/dev/atmega328p/avr5\libatmega328p.a(eewr_byte.o)
 
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x00000000     0x25de
+.debug_info     0x00000000     0x2580
  *(.debug_info .gnu.linkonce.wi.*)
  .debug_info    0x00000000      0x5f4 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/ATmega_DFP/1.5.362/gcc/dev/atmega328p/avr5/crtatmega328p.o
  .debug_info    0x000005f4      0x369 bufferchris.o
- .debug_info    0x0000095d      0x8f8 commandprotocol.o
- .debug_info    0x00001255      0xb49 main.o
- .debug_info    0x00001d9e      0x70c uartchris.o
- .debug_info    0x000024aa       0x9a C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/ATmega_DFP/1.5.362/gcc/dev/atmega328p/avr5\libatmega328p.a(eerd_byte.o)
- .debug_info    0x00002544       0x9a C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/ATmega_DFP/1.5.362/gcc/dev/atmega328p/avr5\libatmega328p.a(eewr_byte.o)
+ .debug_info    0x0000095d      0x8e1 commandprotocol.o
+ .debug_info    0x0000123e      0xb02 main.o
+ .debug_info    0x00001d40      0x70c uartchris.o
+ .debug_info    0x0000244c       0x9a C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/ATmega_DFP/1.5.362/gcc/dev/atmega328p/avr5\libatmega328p.a(eerd_byte.o)
+ .debug_info    0x000024e6       0x9a C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/ATmega_DFP/1.5.362/gcc/dev/atmega328p/avr5\libatmega328p.a(eewr_byte.o)
 
-.debug_abbrev   0x00000000      0xf26
+.debug_abbrev   0x00000000      0xf08
  *(.debug_abbrev)
  .debug_abbrev  0x00000000      0x5a2 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/ATmega_DFP/1.5.362/gcc/dev/atmega328p/avr5/crtatmega328p.o
  .debug_abbrev  0x000005a2       0xfd bufferchris.o
- .debug_abbrev  0x0000069f      0x2c6 commandprotocol.o
- .debug_abbrev  0x00000965      0x2ae main.o
- .debug_abbrev  0x00000c13      0x2eb uartchris.o
- .debug_abbrev  0x00000efe       0x14 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/ATmega_DFP/1.5.362/gcc/dev/atmega328p/avr5\libatmega328p.a(eerd_byte.o)
- .debug_abbrev  0x00000f12       0x14 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/ATmega_DFP/1.5.362/gcc/dev/atmega328p/avr5\libatmega328p.a(eewr_byte.o)
+ .debug_abbrev  0x0000069f      0x2a8 commandprotocol.o
+ .debug_abbrev  0x00000947      0x2ae main.o
+ .debug_abbrev  0x00000bf5      0x2eb uartchris.o
+ .debug_abbrev  0x00000ee0       0x14 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/ATmega_DFP/1.5.362/gcc/dev/atmega328p/avr5\libatmega328p.a(eerd_byte.o)
+ .debug_abbrev  0x00000ef4       0x14 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/ATmega_DFP/1.5.362/gcc/dev/atmega328p/avr5\libatmega328p.a(eewr_byte.o)
 
-.debug_line     0x00000000     0x1a38
+.debug_line     0x00000000     0x1a3b
  *(.debug_line .debug_line.* .debug_line_end)
  .debug_line    0x00000000      0x134 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/ATmega_DFP/1.5.362/gcc/dev/atmega328p/avr5/crtatmega328p.o
  .debug_line    0x00000134      0x428 bufferchris.o
- .debug_line    0x0000055c      0x6d6 commandprotocol.o
- .debug_line    0x00000c32      0x6c9 main.o
- .debug_line    0x000012fb      0x625 uartchris.o
- .debug_line    0x00001920       0x7a C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/ATmega_DFP/1.5.362/gcc/dev/atmega328p/avr5\libatmega328p.a(eerd_byte.o)
- .debug_line    0x0000199a       0x9e C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/ATmega_DFP/1.5.362/gcc/dev/atmega328p/avr5\libatmega328p.a(eewr_byte.o)
+ .debug_line    0x0000055c      0x6f7 commandprotocol.o
+ .debug_line    0x00000c53      0x6ab main.o
+ .debug_line    0x000012fe      0x625 uartchris.o
+ .debug_line    0x00001923       0x7a C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/ATmega_DFP/1.5.362/gcc/dev/atmega328p/avr5\libatmega328p.a(eerd_byte.o)
+ .debug_line    0x0000199d       0x9e C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/ATmega_DFP/1.5.362/gcc/dev/atmega328p/avr5\libatmega328p.a(eewr_byte.o)
 
 .debug_frame    0x00000000      0x4b0
  *(.debug_frame)
@@ -1105,24 +1097,24 @@ END GROUP
  .debug_frame   0x000001f0       0xd8 main.o
  .debug_frame   0x000002c8      0x1e8 uartchris.o
 
-.debug_str      0x00000000     0x9a95
+.debug_str      0x00000000     0x9ad5
  *(.debug_str)
  .debug_str     0x00000000      0x208 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/ATmega_DFP/1.5.362/gcc/dev/atmega328p/avr5/crtatmega328p.o
  .debug_str     0x00000208     0x6d89 bufferchris.o
                                0x6e7c (size before relaxing)
- .debug_str     0x00006f91     0x2174 commandprotocol.o
-                               0x905b (size before relaxing)
- .debug_str     0x00009105      0x807 main.o
-                               0x93bd (size before relaxing)
- .debug_str     0x0000990c      0x189 uartchris.o
-                               0x753e (size before relaxing)
+ .debug_str     0x00006f91     0x21b4 commandprotocol.o
+                               0x905a (size before relaxing)
+ .debug_str     0x00009145      0x807 main.o
+                               0x93c3 (size before relaxing)
+ .debug_str     0x0000994c      0x189 uartchris.o
+                               0x7559 (size before relaxing)
 
-.debug_loc      0x00000000     0x16af
+.debug_loc      0x00000000     0x16f0
  *(.debug_loc)
  .debug_loc     0x00000000      0x23f bufferchris.o
- .debug_loc     0x0000023f      0x2ee commandprotocol.o
- .debug_loc     0x0000052d      0xc6c main.o
- .debug_loc     0x00001199      0x516 uartchris.o
+ .debug_loc     0x0000023f      0x32f commandprotocol.o
+ .debug_loc     0x0000056e      0xc6c main.o
+ .debug_loc     0x000011da      0x516 uartchris.o
 
 .debug_macinfo
  *(.debug_macinfo)
@@ -1142,14 +1134,14 @@ END GROUP
 .debug_pubtypes
  *(.debug_pubtypes)
 
-.debug_ranges   0x00000000      0x218
+.debug_ranges   0x00000000      0x228
  *(.debug_ranges)
  .debug_ranges  0x00000000       0x48 bufferchris.o
- .debug_ranges  0x00000048       0xd0 commandprotocol.o
- .debug_ranges  0x00000118       0x58 main.o
- .debug_ranges  0x00000170       0xa8 uartchris.o
+ .debug_ranges  0x00000048       0xe0 commandprotocol.o
+ .debug_ranges  0x00000128       0x58 main.o
+ .debug_ranges  0x00000180       0xa8 uartchris.o
 
-.debug_macro    0x00000000     0x39ab
+.debug_macro    0x00000000     0x3a65
  *(.debug_macro)
  .debug_macro   0x00000000       0xc9 bufferchris.o
  .debug_macro   0x000000c9      0xa4e bufferchris.o
@@ -1169,18 +1161,18 @@ END GROUP
  .debug_macro   0x0000280d       0x6a bufferchris.o
  .debug_macro   0x00002877       0x4c bufferchris.o
  .debug_macro   0x000028c3       0x1c bufferchris.o
- .debug_macro   0x000028df      0x14c commandprotocol.o
- .debug_macro   0x00002a2b       0x58 commandprotocol.o
- .debug_macro   0x00002a83       0x10 commandprotocol.o
- .debug_macro   0x00002a93       0xf2 commandprotocol.o
- .debug_macro   0x00002b85       0x20 commandprotocol.o
- .debug_macro   0x00002ba5       0xf6 commandprotocol.o
- .debug_macro   0x00002c9b       0x33 commandprotocol.o
- .debug_macro   0x00002cce       0x10 commandprotocol.o
- .debug_macro   0x00002cde       0x35 commandprotocol.o
- .debug_macro   0x00002d13       0xe2 commandprotocol.o
- .debug_macro   0x00002df5       0x92 commandprotocol.o
- .debug_macro   0x00002e87       0x28 commandprotocol.o
+ .debug_macro   0x000028df      0x152 commandprotocol.o
+ .debug_macro   0x00002a31       0x58 commandprotocol.o
+ .debug_macro   0x00002a89       0x10 commandprotocol.o
+ .debug_macro   0x00002a99       0xf2 commandprotocol.o
+ .debug_macro   0x00002b8b       0x20 commandprotocol.o
+ .debug_macro   0x00002bab       0xf6 commandprotocol.o
+ .debug_macro   0x00002ca1       0x33 commandprotocol.o
+ .debug_macro   0x00002cd4       0x10 commandprotocol.o
+ .debug_macro   0x00002ce4       0x35 commandprotocol.o
+ .debug_macro   0x00002d19       0xe2 commandprotocol.o
+ .debug_macro   0x00002dfb       0x92 commandprotocol.o
+ .debug_macro   0x00002e8d       0x22 commandprotocol.o
  .debug_macro   0x00002eaf       0x10 commandprotocol.o
  .debug_macro   0x00002ebf      0x160 commandprotocol.o
  .debug_macro   0x0000301f      0x15b main.o
@@ -1194,7 +1186,9 @@ END GROUP
  .debug_macro   0x000036ae       0x5e main.o
  .debug_macro   0x0000370c       0x37 main.o
  .debug_macro   0x00003743       0x22 main.o
- .debug_macro   0x00003765       0xe0 uartchris.o
- .debug_macro   0x00003845      0x166 uartchris.o
+ .debug_macro   0x00003765       0x28 main.o
+ .debug_macro   0x0000378d       0xe6 uartchris.o
+ .debug_macro   0x00003873       0x8c uartchris.o
+ .debug_macro   0x000038ff      0x166 uartchris.o
 OUTPUT(LEDSTR1.elf elf32-avr)
 LOAD linker stubs

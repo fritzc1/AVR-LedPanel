@@ -29,7 +29,8 @@
 #ifndef COMMANDPROTOCOL_H
 #define COMMANDPROTOCOL_H
 
-#include "global.h"
+#include "bufferchris.h"
+#include "uartchris.h"
 
 #define CMDPROT_MY_ADDRESS	0x31 // ASCII "1"
         // this (dec 20) was the addr of the last device programmed
@@ -47,19 +48,19 @@
 #define CMDPROT_ADDRESS_INITIALIZED     0xA5
 
 void initCommandProtocolLibrary(void);
-u08 setCommandProtocolAddr(u08);
 u08 getCommandProtocolAddr(void);
+u08 setCommandProtocolAddr(u08);
 
 u08 isCommandReady(void);
 void beginCmdProcessing(void);
 void endCmdProcessing(void);
-
+// used by command processors, advances the pointer over ASCII numbers. pass the [address] of your char ptr
+void pointToNextNonNumericChar(unsigned char **);
+// this gets called by endCmdProc() but you can also call it to send (and clear) a message in cmdprotprintbuf
 void sendMsg(void);
-void sendCustomResponse(void);
+// call this to force sendMsg to send a response even if the received address was global (0)
 void forceGlobalCmdResponse(void);
 
-// used by command processors, advances the pointer over ASCII numbers. pass the address of your char *
-void pointToNextNonNumericChar(unsigned char **);
 
 /*********************************************************************
  * Use these flags to control your application's behavior. They will tell
@@ -73,13 +74,12 @@ extern volatile u08 rxAddrNext; // indicate that the next byte rx will be an add
 extern volatile u08 rxAddressed; // indicate whether this unit was addressed by master
 extern volatile u08 rxAddrGlobal; // Do Not Transmit if global address was found
 extern volatile u08 rxCommandProcessing; // command processing latch (started, not complete)
-extern u08 customResponse; // if this is set, then don't send generic "ok" response
 
 
 // the following vars are used to interact with uart receive ISR
 extern cBuffer uartRxBuffer;	// defined in uartchris.c
 extern unsigned short uartRxOverflow; // defined in uartchris.c
-extern char sprintbuf[80]; // output message buffer
+extern char cmdprotprintbuf[80]; // output message buffer
 
 #endif
 

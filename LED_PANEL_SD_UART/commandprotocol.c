@@ -14,12 +14,8 @@
 #include <string.h>
 #include <avr/eeprom.h>
 #include <avr/pgmspace.h>
-
 #include "global.h"
-#include "bufferchris.h"
-#include "uartchris.h"
 #include "commandprotocol.h"
-
 #include <util/delay.h> // FOR DEBUGGING ONLY!!!
 
 // do these need to be available across compile units? ie. in main?
@@ -31,18 +27,18 @@ volatile u08 rxAddrGlobal; // Do Not Transmit if global address was found
 volatile u08 rxCommandProcessing; // command processing latch (started, not complete)
 volatile u08 rxCommandOverloaded; // state when we are addressed while already busy
 u08 myAddress; // in-memory storage of EEPROM address.
-u08 customResponse; // if this is set, then don't send generic "ok" response
 u08 flg_forceGlobalCmdResponse;
-char sprintbuf[80]; // output message buffer
+char cmdprotprintbuf[80]; // output message buffer
 
 
 // function prototypes, internal to library
 void initCommandProtocolAddr(void);
 u08 isAddressInitialized(void);
 void setAddressInitialized(void);
-void myUartRx(unsigned char);
 u08 isMyAddress(u08);
 u08 isGlobalAddress(u08);
+void myUartRx(unsigned char);
+
 
 
 // Externalized Routines 
@@ -52,18 +48,12 @@ u08 isGlobalAddress(u08);
  * 
  ************************************************************************/
 void initCommandProtocolLibrary(void) {
-  // set state:
-  // no message received
+  // set initial state:
   rxCompleteFlag = FALSE;
-  // next byte is not address to check
   rxAddrNext = FALSE;
-  // this device not addressed
   rxAddressed = FALSE;
-  // not global command
   rxAddrGlobal = FALSE;
-  // no overloaded command condition
   rxCommandOverloaded = FALSE;
-  // do not force response on global command
   flg_forceGlobalCmdResponse = FALSE;
   // Chain Command Handler routine to intercept UART receives in ISR
   uartSetRxHandler(myUartRx);
@@ -94,12 +84,82 @@ u08 setCommandProtocolAddr(u08 newAddr) {
   return 0;
 }
 
+/************************************************************************
+ * isCommandReady:
+ * CmdLib accessor function to enable mainline to determine whether to 
+ * process cmd.
+ ************************************************************************/
 u08 isCommandReady(void) {
   if (rxCompleteFlag) {
     return TRUE;
   }
   return FALSE;
 }
+
+/************************************************************************
+ * Set up state to process a command.
+ ************************************************************************/
+void beginCmdProcessing(void) {
+  rxCommandProcessing = TRUE; // cmd interpretation in progress
+  rxCompleteFlag = FALSE; // reset until next cmd comes in
+}
+
+/************************************************************************
+ * Handle standard command end processing.
+ ************************************************************************/
+void endCmdProcessing(void) {
+  sendMsg();
+  bufferClear(&uartRxBuffer,UART_RX_BUFFER_SIZE);
+  rxAddrGlobal = FALSE; // reset address state. this was saved to mute responses on global cmds.
+  rxCommandProcessing = FALSE; // command interpretation and response done
+}
+
+/*********************************************************************
+ * getNextNonNumericChar:
+ *
+ * Modify the pointer passed in to point to next non-numeric char.
+ * We need the argument passed by address so we can modify the
+ * caller's storage.
+ *********************************************************************/
+void pointToNextNonNumericChar(unsigned char **ppRxDataStr) {
+ /* Count the digits. Numbers are 0x30 < n < 0x39 */
+  while((**ppRxDataStr >= 0x30) & (**ppRxDataStr <= 0x39)) {
+    (*ppRxDataStr)++;
+  }
+}
+
+/************************************************************************
+ * sendMsg:
+ * 
+ * Send a response to a cmd if not global, unless forced.
+ ************************************************************************/
+void sendMsg(void) {
+  // don't send messages for global cmd, unless forced
+  if (!rxAddrGlobal || flg_forceGlobalCmdResponse) {
+    flg_forceGlobalCmdResponse = FALSE;
+    // always send a "k" if we're not sending something else.
+    if (strlen(cmdprotprintbuf) == 0) {
+      sprintf_P(cmdprotprintbuf,PSTR("k"));
+    }
+    // add '$' to terminate message if not done
+    if ( (*(char*)((u16)(&cmdprotprintbuf)+strlen(cmdprotprintbuf)-1) != '$') && (strlen(cmdprotprintbuf) < 79) ) {
+      strcat(cmdprotprintbuf, "$");
+    }
+    uartSendBuffer(cmdprotprintbuf,strlen(cmdprotprintbuf));
+  }
+  memset(cmdprotprintbuf, 0, sizeof(cmdprotprintbuf)); 
+}
+
+/************************************************************************
+ * forceGlobalCmdResponse:
+ * 
+ * DANGER: forces sendMsg to xmit a response to global cmd.
+ ************************************************************************/
+void forceGlobalCmdResponse(void) {
+  flg_forceGlobalCmdResponse = TRUE;
+}
+
+
 
 
 // Internal routines 
@@ -121,8 +181,6 @@ void initCommandProtocolAddr() {
     setAddressInitialized();
   }
 }
-
-
 
 /************************************************************************
  * isAddressInitialized:
@@ -233,78 +291,5 @@ void myUartRx(unsigned char c) {
       rxAddrGlobal = TRUE; // mute any response on global cmds
       rxAddressed = TRUE; // this unit is now active and will record bytes 
     }
-  }
-}
-
-/************************************************************************
- * sendMsg:
- * 
- * Send a response to a cmd if not global, unless forced.
- ************************************************************************/
-void sendMsg(void) {
-  // don't send messages for global cmd, unless forced
-  if (!rxAddrGlobal || flg_forceGlobalCmdResponse) {
-    flg_forceGlobalCmdResponse = FALSE;
-    uartSendBuffer(sprintbuf,strlen(sprintbuf));
-  }
-  memset(sprintbuf, 0, sizeof(sprintbuf)); 
-}
-
-/************************************************************************
- * forceGlobalCmdResponse:
- * 
- * DANGER: forces sendMsg to xmit a response to global cmd.
- ************************************************************************/
-void forceGlobalCmdResponse(void) {
-  flg_forceGlobalCmdResponse = TRUE;
-}
-
-/************************************************************************
- * sendCustomResponse:
- * 
- * Set library state to send a custom response string
- ************************************************************************/
-void sendCustomResponse(void) {
-  customResponse = TRUE;
-}
-
-
-/************************************************************************
- * Set up state to process a command.
- ************************************************************************/
-void beginCmdProcessing(void) {
-  rxCommandProcessing = TRUE; // cmd interpretation in progress
-  rxCompleteFlag = FALSE; // reset until next cmd comes in
-}
-
-/************************************************************************
- * Handle standard command end processing.
- ************************************************************************/
-void endCmdProcessing(void) {
-  
-   // always send a "k" if we're not sending something else.
-  if (!customResponse) {
-    sprintf_P(sprintbuf,PSTR("k$"));
-  } else {
-    customResponse = FALSE;
-  }
-  sendMsg();
-  
-  bufferClear(&uartRxBuffer,UART_RX_BUFFER_SIZE);
-  rxAddrGlobal = FALSE; // reset address state. this was saved to mute responses on global cmds.
-  rxCommandProcessing = FALSE; // command interpretation and response done
-}
-
-/*********************************************************************
- * getNextNonNumericChar:
- *
- * Modify the pointer passed in to point to next non-numeric char.
- * We need the argument passed by address so we can modify the
- * caller's storage.
- *********************************************************************/
-void pointToNextNonNumericChar(unsigned char **ppRxDataStr) {
- /* Count the digits. Numbers are 0x30 < n < 0x39 */
-  while((**ppRxDataStr >= 0x30) & (**ppRxDataStr <= 0x39)) {
-    (*ppRxDataStr)++;
   }
 }

@@ -774,8 +774,8 @@ int main(void) {
   // This MUST occur before ANY UART IO happens!!
   sei();
   
-  sprintf_P((char *)sprintbuf,PSTR("testing %d$"), CMDPROT_MY_ADDRESS);
-  uartSendBuffer(sprintbuf,strlen(sprintbuf));
+  sprintf_P((char *)cmdprotprintbuf,PSTR("testing %d$"), CMDPROT_MY_ADDRESS);
+  uartSendBuffer(cmdprotprintbuf,strlen(cmdprotprintbuf));
   
   /* Loop forever, handle uart messages if we get any */
   while (1) { 
@@ -819,8 +819,7 @@ void processCmd() {
       case 'a':
         rc = setCommandProtocolAddr(atoi((char *)myRxBufferDataPtr));
         if (rc) {
-          sendCustomResponse();
-          sprintf_P(sprintbuf,PSTR("err-badaddr$"));
+          sprintf_P(cmdprotprintbuf,PSTR("err-badaddr"));
         }
         // use EEPROM to store address between powerups. Only reprogram on non-global addr.
         pointToNextNonNumericChar(&myRxBufferDataPtr);
@@ -838,30 +837,26 @@ void processCmd() {
       // Get info
       case 'g': case 'G':
         // Indicate to cmd protocol that we are sending a custom ack
-        sendCustomResponse();
         // select sub-command
         switch(*myRxBufferDataPtr++) {
           case 'a': case 'A':
-            sprintf_P(sprintbuf, PSTR("g0x%02x$"), getCommandProtocolAddr());
+            sprintf_P(cmdprotprintbuf, PSTR("g0x%02x$"), getCommandProtocolAddr());
             // SPECIAL CASE!! we WANT to get the address back on a global command!
             // You can only have ONE device on the net for this to work. Otherwise, user beware!
             forceGlobalCmdResponse();
             break;
           
           case 'b': case 'B':
-            sprintf_P(sprintbuf, PSTR("g%s$"), getVolatileString());
-            sendMsg();
+            sprintf_P(cmdprotprintbuf, PSTR("g%s$"), getVolatileString());
             break;
             
           default:
-            sprintf_P(sprintbuf,PSTR("err-getnoprop$"));
-            sendMsg();
+            sprintf_P(cmdprotprintbuf,PSTR("err-getnoprop$"));
         }
         break; // end 'g' command
         
       default:
-        sendCustomResponse();
-        sprintf_P(sprintbuf, PSTR("err-cmd$"));
+        sprintf_P(cmdprotprintbuf, PSTR("err-cmd$"));
     } // end switch on command
   } // end while more data
 }
